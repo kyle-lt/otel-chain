@@ -1,11 +1,19 @@
-# go-otel-api
+# otel-chain
 ## Overview
 
-The purpose of this application is to create a simple, go api, used in a distributed microservices example of how OpenTelemetry works across different programming languages.  
+The purpose of this application is to create a distributed trace using OpenTelemetry libraries for many different languages.  Currently, the languages are:
+- Node.js
+- Go
+- Python
+- Rust
+- Java
+- Dotnet (core)
+- Ruby
 
-Node.js --> Go API --> Python API
+The current call flow is
 
-This app was compiled from existing examples:
+Node.js --> Go --> Python --> Rust --> Java --> Dotnet //TODO --> Ruby
 
-[OpenTelemetry Go Getting Started](https://opentelemetry.io/docs/go/getting-started/)
-[OpenTelemetry Go OTLP Example](https://github.com/open-telemetry/opentelemetry-go/tree/main/example/otel-collector)
+The project uses the OpenTelemetry Collector and Jaeger to collect the spans.
+
+// TODO - the rest of the docs.
