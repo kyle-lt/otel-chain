@@ -1,0 +1,48 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    faraday (0.16.2)
+      multipart-post (>= 1.2, < 3)
+    google-protobuf (3.15.1)
+    multipart-post (2.1.1)
+    mustermann (1.1.1)
+      ruby2_keywords (~> 0.0.1)
+    opentelemetry-api (0.15.0)
+    opentelemetry-common (0.15.0)
+      opentelemetry-api (~> 0.15.0)
+    opentelemetry-exporter-jaeger (0.15.0)
+      opentelemetry-api (~> 0.15.0)
+      opentelemetry-common (~> 0.15.0)
+      thrift
+    opentelemetry-exporter-otlp (0.15.0)
+      google-protobuf (~> 3.7)
+      opentelemetry-api (~> 0.15.0)
+      opentelemetry-common (~> 0.15.0)
+    opentelemetry-sdk (0.15.0)
+      opentelemetry-api (~> 0.15.0)
+      opentelemetry-common (~> 0.15.0)
+    rack (2.2.3)
+    rack-protection (2.1.0)
+      rack
+    ruby2_keywords (0.0.4)
+    sinatra (2.1.0)
+      mustermann (~> 1.0)
+      rack (~> 2.2)
+      rack-protection (= 2.1.0)
+      tilt (~> 2.0)
+    thrift (0.14.0)
+    tilt (2.0.10)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  faraday (~> 0.16.1)
+  opentelemetry-api
+  opentelemetry-exporter-jaeger
+  opentelemetry-exporter-otlp
+  opentelemetry-sdk
+  sinatra (~> 2.0)
+
+BUNDLED WITH
+   1.17.2

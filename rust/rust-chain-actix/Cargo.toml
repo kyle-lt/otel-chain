@@ -1,0 +1,23 @@
+[package]
+name = "rust-chain-actix"
+version = "0.1.0"
+authors = ["Kyle Tully <kjtully@yahoo.com>"]
+edition = "2018"
+
+[[bin]] # Bin to run the http server
+name = "rust-chain-actix"
+path = "src/rust-chain-actix.rs"
+
+[dependencies]
+opentelemetry = { version = "0.12.0", features = ["async-std", "reqwest"] }
+opentelemetry-http = { version = "0.1.0" }
+opentelemetry-semantic-conventions = { version = "0.4.0" }
+opentelemetry-otlp = { version = "0.5.0" }
+opentelemetry-jaeger = { version = "0.11.0" }
+thrift = { version = "0.13" }
+futures = { version = "0.3" }
+actix-web = { version = "3.3.2" }
+actix-service = { version = "1.0.6" }
+env_logger = { version = "0.8.2" }
+tokio = { version = "1.0", features = ["full"] }
+tokio-compat-02 = { version = "0.2.0" }

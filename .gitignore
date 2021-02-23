@@ -1,0 +1,12 @@
+# Omit rust, java target directories
+target/
+
+# Omit node.js node_modules
+node_modules/
+
+# Omit dotnet bin and obj files
+bin/
+obj/
+
+# Omit MacOS DS_Store
+.DS_Store

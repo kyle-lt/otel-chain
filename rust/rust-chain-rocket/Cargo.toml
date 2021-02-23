@@ -1,0 +1,8 @@
+[package]
+name = "rust-chain-rocket"
+version = "0.1.0"
+authors = ["Kyle Tully <kjtully@yahoo.com>"]
+edition = "2018"
+
+[dependencies]
+rocket = "0.4.7"

@@ -1,0 +1,4 @@
+AH00112: Warning: DocumentRoot [/var/www/html] does not exist
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.17.0.2. Set the 'ServerName' directive globally to suppress this message
+[Sun Feb 21 23:54:34.883075 2021] [mpm_prefork:notice] [pid 1] AH00163: Apache/2.4.38 (Debian) PHP/7.4.15 configured -- resuming normal operations
+[Sun Feb 21 23:54:34.883754 2021] [core:notice] [pid 1] AH00094: Command line: 'apache2 -D FOREGROUND'

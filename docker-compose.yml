@@ -1,0 +1,94 @@
+version: "3.7"
+
+networks:
+  monitoring:
+    external: true
+
+services:
+
+  node-chain:
+    build: ./node
+    image: kjtully/otel-chain-node:latest
+    container_name: node-chain
+    env_file:
+      - otel-chain-env-vars.env
+    ports:
+      - "40000:40000"
+    networks:
+      - monitoring
+  
+  go-chain:
+    build: ./go
+    image: kjtully/otel-chain-go:latest
+    container_name: go-chain
+    env_file:
+      - otel-chain-env-vars.env
+    ports:
+      - "41000:41000"
+    networks:
+      - monitoring
+
+  python-chain:
+    build: ./python
+    image: kjtully/otel-chain-python:latest
+    container_name: python-chain
+    env_file:
+      - otel-chain-env-vars.env
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kjt-OTel-chain"
+    ports:
+      - "42000:42000"
+    networks:
+      - monitoring
+
+  rust-chain:
+    build: ./rust/rust-chain-hyper
+    image: kjtully/otel-chain-rust:latest
+    container_name: rust-chain
+    env_file:
+      - otel-chain-env-vars.env
+    #environment:
+    #  OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kjt-OTel-chain"
+    ports:
+      - "43000:43000"
+    networks:
+      - monitoring
+
+  java-chain:
+    build: ./java/otelChain
+    image: kjtully/otel-chain-java:latest
+    container_name: java-chain
+    env_file:
+      - otel-chain-env-vars.env
+    environment:
+      #OTEL_RESOURCE_ATTRIBUTES is defined in OtelTracerConfig.java
+      #OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kjt-OTel-chain,service.name=java-chain"
+      SERVER_PORT: "44000"
+    ports:
+      - "44000:44000"
+    networks:
+      - monitoring
+
+  dotnet-chain:
+    build: ./dotnet/dotnet-chain
+    image: kjtully/otel-chain-dotnet:latest
+    container_name: dotnet-chain
+    env_file:
+      - otel-chain-env-vars.env
+    ports:
+      - "45000:5000"
+    networks:
+      - monitoring
+
+  ruby-chain:
+    build: ./ruby
+    image: kjtully/otel-chain-ruby:latest
+    container_name: ruby-chain
+    env_file:
+      - otel-chain-env-vars.env
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kjt-OTel-chain,service.name=ruby-chain"
+    ports:
+      - "47000:4567"
+    networks:
+      - monitoring
