@@ -18,10 +18,13 @@ import com.ktully.otelChain.OtelTracerConfig;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.TextMapGetter;
 import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.context.propagation.TextMapSetter;
 
 @RestController
 public class Controller {
@@ -38,7 +41,7 @@ public class Controller {
 	 * Configuration for Context Propagation to be done via @RequestHeader
 	 * extraction
 	 */
-	TextMapPropagator.Getter<Map<String, String>> getter = new TextMapPropagator.Getter<Map<String, String>>() {
+	TextMapGetter<Map<String, String>> getter = new TextMapGetter<Map<String, String>>() {
 		@Override
 		public String get(Map<String, String> carrier, String key) {
 			logger.debug("Key = " + key);
@@ -56,7 +59,7 @@ public class Controller {
 	/*
 	 * Configuration for Context Propagation to be done via HttpHeaders injection
 	 */
-	private static final TextMapPropagator.Setter<HttpHeaders> httpHeadersSetter = new TextMapPropagator.Setter<HttpHeaders>() {
+	private static final TextMapSetter<HttpHeaders> httpHeadersSetter = new TextMapSetter<HttpHeaders>() {
 		@Override
 		public void set(HttpHeaders carrier, String key, String value) {
 			logger.debug("RestTemplate - Adding Header with Key = " + key);
@@ -79,7 +82,7 @@ public class Controller {
 			logger.error("Exception caught while extracting Context Propagators", e);
 		}
 		
-		Span serverSpan = tracer.spanBuilder("HTTP GET /node-chain").setParent(extractedContext).setSpanKind(Span.Kind.SERVER).startSpan();
+		Span serverSpan = tracer.spanBuilder("HTTP GET /node-chain").setParent(extractedContext).setSpanKind(SpanKind.SERVER).startSpan();
 		try (Scope scope = serverSpan.makeCurrent()) {
 			logger.debug("Trying to build Span and then make RestTemplate call downstream");
 			// Add the attributes defined in the Semantic Conventions
@@ -91,7 +94,7 @@ public class Controller {
 			RestTemplate restTemplate = new RestTemplate();
 			HttpHeaders propagationHeaders = new HttpHeaders();
 
-			Span restTemplateSpan = tracer.spanBuilder("HTTP GET dotnet-chain/node-chain").setSpanKind(Span.Kind.CLIENT).startSpan();
+			Span restTemplateSpan = tracer.spanBuilder("HTTP GET dotnet-chain/node-chain").setSpanKind(SpanKind.CLIENT).startSpan();
 			try (Scope outgoingScope = restTemplateSpan.makeCurrent()) {
 				// Add some important info to our Span
 				restTemplateSpan.addEvent("Calling dotnet-chain/node-chain via RestTemplate"); // This ends up in "logs"

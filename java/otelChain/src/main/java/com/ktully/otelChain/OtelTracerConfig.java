@@ -44,7 +44,7 @@ public class OtelTracerConfig {
 	    // ** Create OTLP gRPC Span Exporter & BatchSpanProcessor **
 		OtlpGrpcSpanExporter spanExporter =
 	            OtlpGrpcSpanExporter.builder()
-	            	.setEndpoint("host.docker.internal:4317")
+	            	.setEndpoint("http://host.docker.internal:4317")
 	            	.setTimeout(2, TimeUnit.SECONDS).build();
 	        BatchSpanProcessor spanProcessor =
 	            BatchSpanProcessor.builder(spanExporter)
