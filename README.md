@@ -12,7 +12,7 @@ The purpose of this application is to create a distributed trace using OpenTelem
 
 The current call flow is
 
-Node.js --> Go --> Python --> Rust --> Java --> Dotnet //TODO --> Ruby
+Node.js --> Go --> Python --> Rust --> Java --> Dotnet --> Ruby
 
 The project uses the OpenTelemetry Collector and Jaeger to collect the spans.
 
