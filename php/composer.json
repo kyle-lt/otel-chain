@@ -1,0 +1,9 @@
+{
+    "name": "kjtully/php-chain",
+    "description": "Sample PHP OTel App.",
+    "license": "Apache-2.0",
+    "minimum-stability": "dev",
+    "require": {
+        "open-telemetry/opentelemetry": "dev-main"
+    }
+}
