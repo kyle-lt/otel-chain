@@ -21,6 +21,8 @@ $samplingResult = $sampler->shouldSample(
     'io.opentelemetry.example',
     API\SpanKind::KIND_INTERNAL
 );
+// export OTEL_EXPORTER_OTLP_ENDPOINT=host.docker.internal:55681
+// export OTEL_EXPORTER_OTLP_INSECURE=true
 $Exporter = new OTLPExporter(
     'OTLP Example Service'
 );
@@ -43,7 +45,7 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
         ->getTracer('io.opentelemetry.contrib.php');
 
     ResourceInfo::merge($myResourceInfo, $tracer->getResource());
-    
+
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
         $timestamp = Clock::get()->timestamp();

@@ -23,8 +23,10 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapGetter;
-import io.opentelemetry.context.propagation.TextMapPropagator;
+//import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.context.propagation.TextMapSetter;
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
 
 @RestController
 public class Controller {
@@ -85,6 +87,13 @@ public class Controller {
 		Span serverSpan = tracer.spanBuilder("HTTP GET /node-chain").setParent(extractedContext).setSpanKind(SpanKind.SERVER).startSpan();
 		try (Scope scope = serverSpan.makeCurrent()) {
 			logger.debug("Trying to build Span and then make RestTemplate call downstream");
+			
+			// Add some "Events" (AKA logs) to the span
+			serverSpan.addEvent("This is an event with no Attributes");
+			AttributeKey<String> attrKey = AttributeKey.stringKey("attrKey");
+			Attributes spanEventAttr = Attributes.of(attrKey, "attrVal");
+			serverSpan.addEvent("This is an event with an Attributes String Array", spanEventAttr);
+			
 			// Add the attributes defined in the Semantic Conventions
 			serverSpan.setAttribute("http.method", "GET");
 			serverSpan.setAttribute("http.scheme", "http");
