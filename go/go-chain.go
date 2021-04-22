@@ -147,12 +147,14 @@ func nodeChainHandler(w http.ResponseWriter, req *http.Request) {
 	reqSpan := trace.SpanFromContext(ctx)
 	defer reqSpan.End()
 
+	/* Disabling the manual spans for now to keep this *relatively* simple
 	// Create a parent span called "operation"
 	func(ctx context.Context) {
 		var span trace.Span
 		ctx, span = tracer.Start(ctx, "node-chain operation")
 		defer span.End()
 
+		
 		// Create a child span called "sub-operation"
 		func(ctx context.Context) {
 			var span trace.Span
@@ -166,6 +168,7 @@ func nodeChainHandler(w http.ResponseWriter, req *http.Request) {
 			//time.Sleep(time.Duration(n) * time.Second)
 		}(ctx)
 	}(ctx)
+	*/
 
 	// Let's create another span to make a downstream call
 
