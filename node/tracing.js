@@ -38,6 +38,9 @@ registerInstrumentations({
             // Name the Span using the URL path, if possible
             if (!typeof request.path === 'undefined') {
               span.updateName(request.method + " " + request.path);
+            } else {
+              // hard-code the span name
+              span.updateName("GET /node-start");
             }
           },
         }
