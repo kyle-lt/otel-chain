@@ -10,8 +10,6 @@ services:
     build: ./node
     image: kjtully/otel-chain-node:latest
     container_name: node-chain
-    environment:
-      - OTEL_LOG_LEVEL=INFO
     env_file:
       - otel-chain-env-vars.env
     ports:
