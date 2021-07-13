@@ -9,9 +9,10 @@ const axios = require("axios");
 
 const app = express();
 
-app.get("/node-start", (req, res) => {
-  console.log("Starting chain at Node.js!");
-  console.log("Sending call to Go!");
+app.get('/*', (req, res) => {
+  console.log(`Incoming HTTP GET at URL: ${req.url}`);
+  //console.log("Starting chain at Node.js!");
+  //console.log("Sending call to Go!");
   axios
     .get(`http://${GO_URL}:${GO_PORT}/node-chain`)
     .then(result => {
