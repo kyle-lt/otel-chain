@@ -8,10 +8,11 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
     ConsoleSpanExporter,
-    SimpleExportSpanProcessor,
-    BatchExportSpanProcessor
+    SimpleSpanProcessor,
+    BatchSpanProcessor
 )
-from opentelemetry.exporter.otlp.trace_exporter import OTLPSpanExporter
+#from opentelemetry.exporter.otlp.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 
 # Logging
@@ -36,11 +37,11 @@ otlp_span_exporter = OTLPSpanExporter(endpoint="host.docker.internal:4317", inse
 trace.set_tracer_provider(TracerProvider(resource=resource))
 # Add Console Exporter
 trace.get_tracer_provider().add_span_processor(
-    SimpleExportSpanProcessor(ConsoleSpanExporter())
+    SimpleSpanProcessor(ConsoleSpanExporter())
 )
 # Add OTLP Exporter
 trace.get_tracer_provider().add_span_processor(
-    BatchExportSpanProcessor(otlp_span_exporter)
+    BatchSpanProcessor(otlp_span_exporter)
 )
 
 app = flask.Flask(__name__)
