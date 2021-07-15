@@ -38,30 +38,30 @@
 		<dependency>
 			<groupId>io.opentelemetry</groupId>
 			<artifactId>opentelemetry-api</artifactId>
-			<version>1.1.0</version>
+			<version>1.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.opentelemetry</groupId>
 			<artifactId>opentelemetry-sdk</artifactId>
-			<version>1.1.0</version>
+			<version>1.4.0</version>
 		</dependency>
 		<!-- Logging Exporter -->
 		<dependency>
 			<groupId>io.opentelemetry</groupId>
 			<artifactId>opentelemetry-exporter-logging</artifactId>
-			<version>1.1.0</version>
+			<version>1.4.0</version>
 		</dependency>
 		<!-- Jaeger Exporter -->
 		<dependency>
 			<groupId>io.opentelemetry</groupId>
 			<artifactId>opentelemetry-exporter-jaeger</artifactId>
-			<version>1.1.0</version>
+			<version>1.4.0</version>
 		</dependency>
 		<!-- OTLP Exporter -->
 		<dependency>
 			<groupId>io.opentelemetry</groupId>
 			<artifactId>opentelemetry-exporter-otlp</artifactId>
-			<version>1.1.0</version>
+			<version>1.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
