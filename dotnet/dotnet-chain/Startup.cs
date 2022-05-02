@@ -42,7 +42,16 @@ namespace dotnet_chain
             // Add OpenTelemetry Console Exporter & OTLP Exporter
             // 1.0.0-rc1.1
             services.AddOpenTelemetryTracing((builder) => builder
-                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("dotnet-chain","kjt-Otel-chain"))
+                .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                    .AddService("dotnet-chain","kjt-Otel-chain")
+                    // Manually having to add-in telemetry.sdk.langugage...
+                    .AddAttributes(
+                        new KeyValuePair<string, object>[]
+                        {
+                            new("telemetry.sdk.language", "dotnet")
+                        }
+                    )
+                )
                 .AddSource(nameof(DotnetChainController))
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
