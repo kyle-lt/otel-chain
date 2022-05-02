@@ -27,7 +27,8 @@ logger.addHandler(ch)
 # export OTEL_RESOURCE_ATTRIBUTES=service.namespace:kjt-OTel-chain
 resource = Resource(attributes={
     "service.name": "python-chain",
-    "service.namespace": "kjt-OTel-chain"
+    "service.namespace": "kjt-OTel-chain",
+    "telemetry.sdk.language": "python"
 })
 
 # Create OTLP Span Exporter
