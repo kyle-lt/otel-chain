@@ -55,6 +55,7 @@ class OpenTelemetryMiddleware
         'http.method' => env['REQUEST_METHOD'],
         'http.route' => env['PATH_INFO'],
         'http.url' => env['REQUEST_URI'],
+        'telemetry.sdk.language' => 'ruby',
       },
       kind: :server,
       with_parent: context
