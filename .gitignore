@@ -13,3 +13,6 @@ obj/
 
 # PHP vendor dir
 /php/vendor
+
+# Go Binary
+/go/main
