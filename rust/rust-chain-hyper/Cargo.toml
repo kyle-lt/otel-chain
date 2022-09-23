@@ -16,8 +16,13 @@ path = "src/rust-chain-hyper.rs"
 hyper = { version = "0.14", features = ["full"] }
 tokio = { version = "1.0", features = ["full"] }
 opentelemetry = { version = "0.12.0", features = ["tokio-support", "reqwest"] }
+#opentelemetry = { version = "0.17.0", features = ["rt-tokio"] }
 opentelemetry-http = { version = "0.1.0" }
+#opentelemetry-http = { version = "0.6.0" }
 opentelemetry-semantic-conventions = { version = "0.4.0" }
+#opentelemetry-semantic-conventions = { version = "0.9.0" }
 opentelemetry-otlp = { version = "0.5.0" }
-routerify = { version = "2.0.0-beta-2" }
+#opentelemetry-otlp = { version = "0.9.0", features = ["tonic"] }
+#routerify = { version = "2.0.0-beta-2" }
+routerify = { version = "3.0.0" }
 log = { version = "0.4.14" }
