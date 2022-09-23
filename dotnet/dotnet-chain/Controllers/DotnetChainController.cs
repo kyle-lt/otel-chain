@@ -28,6 +28,8 @@ namespace dotnet_chain.Controllers
 
             // Execute HTTP Client call downstream
             var uri = "http://host.docker.internal:47000/node-chain";
+            // Changing to HTTP BIN for now
+            //var uri = "http://httpbin.org/get";
             var responseTask = client.GetStringAsync(uri);
             var response = await responseTask;
 
