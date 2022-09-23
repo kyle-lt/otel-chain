@@ -48,7 +48,7 @@ services:
     env_file:
       - otel-chain-env-vars.env
     #environment:
-    #  OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kjt-OTel-chain"
+      #OTEL_RESOURCE_ATTRIBUTES: "telemetry.sdk.language=java" # this didn't seem to take
     ports:
       - "43000:43000"
     networks:
