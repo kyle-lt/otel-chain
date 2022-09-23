@@ -1,5 +1,6 @@
 use hyper::{Method, Body, Request, Response, Server, StatusCode, Client};
 use opentelemetry::sdk;
+use opentelemetry::KeyValue;
 use opentelemetry::trace::TraceError;
 use opentelemetry::{
     global,
@@ -7,7 +8,7 @@ use opentelemetry::{
         propagation::TraceContextPropagator,
         trace::{Config, Sampler},
     },
-    trace::{TraceContextExt, Tracer},
+    trace::{TraceContextExt, Tracer, SpanKind},
     Context,
 };
 use opentelemetry_http::HeaderExtractor;
@@ -25,15 +26,19 @@ async fn node_chain_handler(req: Request<Body>) -> Result<Response<Body>, Infall
     let parent_cx = global::get_text_map_propagator(|propagator| {
         propagator.extract(&HeaderExtractor(req.headers()))
     });
-    // Start Span using the extracted Context
-    let parent_span = global::tracer("otel-rust").start_with_context("rust-chain", parent_cx);
+
+    // Declare a Tracer
+    let tracer = global::tracer("otel-rust");
+    
+    // Start a Server Span "rust-chain" using the extracted Context
+    let parent_span = tracer.span_builder("rust-chain").with_parent_context(parent_cx).with_kind(SpanKind::Server).start(&tracer);
     let current_cx = Context::current_with_span(parent_span);
 
     // Create new Hyper HTTP Client
     let client = Client::new();
     
-    // Initialize Tracing
-    let child_span = global::tracer("otel-rust").start_with_context("HTTP GET ruby-chain/node-chain", current_cx);
+    // Start a Client Span using the Server Span as parent context
+    let child_span = tracer.span_builder("HTTP GET java-chain/node-chain").with_parent_context(current_cx).with_kind(SpanKind::Client).start(&tracer);
     let cx = Context::current_with_span(child_span);
 
     // Configure and send HTTP GET 
@@ -62,6 +67,8 @@ fn init_tracer() -> Result<(sdk::trace::Tracer, opentelemetry_otlp::Uninstall), 
             resource: Arc::new(sdk::Resource::new(vec![
                 semcov::resource::SERVICE_NAME.string("rust-chain"),
                 semcov::resource::SERVICE_NAMESPACE.string("kjt-OTel-chain"),
+                KeyValue::new("telemetry.sdk.language", "rust"),
+                KeyValue::new("span.kind", "server"),
             ])),
             default_sampler: Box::new(Sampler::AlwaysOn),
             ..Default::default()
@@ -88,7 +95,7 @@ async fn error_handler(err: routerify::Error, _: RequestInfo) -> Response<Body> 
 fn router() -> Router<Body, Infallible> {
     Router::builder()
         .get("/node-chain", node_chain_handler)
-        .err_handler_with_info(error_handler)
+        //.err_handler_with_info(error_handler)
         .build()
         .unwrap()
 }
