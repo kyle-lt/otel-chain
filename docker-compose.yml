@@ -88,6 +88,7 @@ services:
       - otel-chain-env-vars.env
     environment:
       OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kjt-OTel-chain,service.name=ruby-chain"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://host.docker.internal:4317"
     ports:
       - "47000:4567"
     networks:
