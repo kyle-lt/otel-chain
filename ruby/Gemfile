@@ -6,5 +6,5 @@ gem "faraday", "~> 0.16.1"
 gem "opentelemetry-api"
 gem "opentelemetry-sdk"
 gem "opentelemetry-exporter-otlp"
-gem "opentelemetry-exporter-jaeger"
+gem 'opentelemetry-instrumentation-all'
 gem "sinatra", "~> 2.0"
