@@ -16,13 +16,19 @@ The current call flow is
 
 Node.js --> Go --> Python --> Rust --> Java --> Dotnet --> Ruby
 
-The project is configured to use the OpenTelemetry Collector to receive the spans - but the OTel Collector is not part of this repo!
-
-This [local-monitoring-stack](https://github.com/kyle-lt/local-monitoring-stack) repo might help to setup the OTel Collector.
+   > __Note:__  This project is configured to use the OpenTelemetry Collector to receive the spans - but the OTel Collector is not part of this repo!
+   - This [local-monitoring-stack](https://github.com/kyle-lt/local-monitoring-stack) repo might help you to setup the OTel Collector, or check out the OTel Collector [Getting Started](https://opentelemetry.io/docs/collector/getting-started/) docs.
 
 ## How to Run
 
-1. Start on OpenTelemetry Collector and whichever desired backend.
+0. When running the first time, create docker network `monitoring`
+```bash
+docker create network monitoring
+```
+
+1. Start OpenTelemetry Collector (and, optionally, whichever desired backend).
+
+   > __Note:__  As mentioned above, an OTel Collector is **required** but not included in this repo.
 
 2. Build the services via `docker-compose`
 ```bash
