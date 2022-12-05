@@ -24,39 +24,115 @@ This [local-monitoring-stack](https://github.com/kyle-lt/local-monitoring-stack)
 
 1. Start on OpenTelemetry Collector and whichever desired backend.
 
-2. Start entire system via `docker-compose`
+2. Build the services via `docker-compose`
+```bash
+docker-compose build
+```
+
+3. Start entire system via `docker-compose`
 ```bash
 docker-compose up -d
 ```
 
-3. Issue request to Node.js entrypoint
+4. Issue request to Node.js entrypoint
 ```bash
 curl localhost:40000/node-start
 ```
 
-4. Look at your backend to see the traces, or have a look at the OTel Collector's logs
+5. Look at your backend to see the traces, or have a look at the OTel Collector's logs
 ```bash
 docker logs -f otel-collector
 ```
 
+## Individual Service Descriptions
+
 ### Node.js
 
-The entry point (root span) of the trace.
+The entry point service (root span) of the trace.
 
-Port 40000
+| Property | Value |
+| ------ | ------- |
+| Server | `Express` |
+| Instrumentation | Manual |
+| Default Port | `40000` | 
 
 More detailed [README](/node/README.md).
 
 ### Go
 
+The second service of the trace.
 
+| Property | Value |
+| ------ | ------- |
+| Server | `net/http` |
+| Instrumentation | Manual |
+| Default Port | `41000` |
+
+More detailed README.
 
 ### Python
 
+The third service of the trace.
+
+| Property | Value |
+| ------ | ------- |
+| Server | `flask` |
+| Instrumentation | `flask`, `requests` Auto-Instrumentation |
+| Default Port | `42000`|
+
+More detailed README.
+
 ### Rust
+
+The fourth service of the trace.
+
+| Property | Value |
+| ------ | ------- |
+| Server | `hyper` |
+| Instrumentation | Manual |
+| Default Port | `43000` |
+
+More detailed README.
 
 ### Java
 
+The fifth service of the trace.
+
+| Property | Value |
+| ------ | ------- |
+| Server | `spring-boot` |
+| Instrumentation | Manual |
+| Default Port | `44000` |
+
+More detailed README.
+
 ### Dotnet
 
+The sixth service of the trace.
+
+| Property | Value |
+| ------ | ------- |
+| Server | `AspNetCore.Hosting` |
+| Instrumentation | `OpenTelemetry.Extensions.Hosting`, `OpenTelemetry.Instrumentation.AspNetCore`, `OpenTelemetry.Instrumentation.Http` Auto-Instrumentation |
+| Default Port | `45000` |
+
+More detailed README.
+
 ### Ruby
+
+The final service in the trace.
+
+| Property | Value |
+| ------ | ------- |
+| Server | `Sinatra` |
+| Instrumentation | `all` Auto-Instrumentation |
+| Default Port | `47000` |
+
+
+More detailed [README](/ruby/README.md)
+
+## TODO
+
+- rebuild java Dockerfile with multi-stage build
+- load generator
+- finish individual service `READMEs`
