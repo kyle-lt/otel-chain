@@ -139,6 +139,5 @@ More detailed [README](/ruby/README.md)
 
 ## TODO
 
-- rebuild java Dockerfile with multi-stage build
 - load generator
 - finish individual service `READMEs`
