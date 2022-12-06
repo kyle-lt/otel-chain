@@ -14,7 +14,7 @@ require 'opentelemetry/exporter/otlp'
 require 'opentelemetry/instrumentation/all'
 
 # Export traces to console by default
-ENV['OTEL_TRACES_EXPORTER'] ||= 'console'
+# ENV['OTEL_TRACES_EXPORTER'] ||= 'console'
 # export OTEL_RESOURCE_ATTRIBUTES=service.namespace=kjt-OTel-chain,service.name=ruby-chain
 
 # Configure the SDK to use OTLP exporter over HTTP via BatchSpanProcessor, and
