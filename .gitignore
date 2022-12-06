@@ -16,3 +16,6 @@ obj/
 
 # Go Binary
 /go/main
+
+# VS Code
+.vscode/
