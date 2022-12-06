@@ -26,12 +26,6 @@ Node.js --> Go --> Python --> Rust --> Java --> Dotnet --> Ruby
 docker create network monitoring
 ```
 
-> __Note:__  You need to build the Java spring-boot jar locally inside of the `java-chain` direcotory - removing need for this step ASAP!!!
-```bash
-mvn clean package
-```
-
-
 1. Start OpenTelemetry Collector (and, optionally, whichever desired backend).
 
    > __Note:__  As mentioned above, an OTel Collector is **required** but not included in this repo.
