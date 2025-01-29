@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -186,7 +185,7 @@ func nodeChainHandler(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		body, err = ioutil.ReadAll(res.Body)
+		body, err = io.ReadAll(res.Body)
 		_ = res.Body.Close()
 
 		return err
@@ -257,7 +256,7 @@ func goChainHandler(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		body, err = ioutil.ReadAll(res.Body)
+		body, err = io.ReadAll(res.Body)
 		_ = res.Body.Close()
 
 		return err
