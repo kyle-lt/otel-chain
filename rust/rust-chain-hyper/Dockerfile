@@ -16,7 +16,7 @@ RUN rm ./target/release/deps/rust_chain_hyper*
 RUN cargo build --release
 
 # Move executable to run container
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 RUN apt-get update && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/src/rust-chain-hyper/target/release/rust-chain-hyper ./rust-chain-hyper
 CMD ["./rust-chain-hyper"]
