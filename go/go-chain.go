@@ -8,121 +8,119 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"os/signal"
 	"time"
-
-	"google.golang.org/grpc"
 
 	"github.com/bmizerany/pat"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpgrpc"
-	"go.opentelemetry.io/otel/propagation"
-	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
-	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
-	"go.opentelemetry.io/otel/sdk/metric/selector/simple"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
+
+	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/semconv"
 	"go.opentelemetry.io/otel/trace"
+
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 )
 
-func handleErr(err error, message string) {
+var serviceName = semconv.ServiceNameKey.String("go-chain")
+var serviceNameSpace = semconv.ServiceNamespaceKey.String("kjt-OTel-chain")
+
+// Initialize a gRPC connection to be used bythe tracer providers
+func initConn() (*grpc.ClientConn, error) {
+	// It connects the OpenTelemetry Collector through local gRPC connection.
+	// You may replace `localhost:4317` with your endpoint.
+	conn, err := grpc.NewClient("host.docker.internal:4317",
+		// Note the use of insecure transport here. TLS is recommended in production.
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
-		log.Fatalf("%s: %v", message, err)
+		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
 	}
+
+	return conn, err
 }
 
-// Initializes an OTLP exporter, and configures the corresponding trace provider
-func initProvider() func() {
-	ctx := context.Background()
-
-	// If the OpenTelemetry Collector is running on a local cluster (minikube or
-	// microk8s), it should be accessible through the NodePort service at the
-	// `localhost:30080` endpoint. Otherwise, replace `localhost` with the
-	// endpoint of your cluster. If you run the app inside k8s, then you can
-	// probably connect directly to the service through dns
-	driver := otlpgrpc.NewDriver(
-		otlpgrpc.WithInsecure(),
-		otlpgrpc.WithEndpoint("host.docker.internal:4317"),
-		otlpgrpc.WithDialOption(grpc.WithBlock()), // useful for testing
-	)
-	exp, err := otlp.NewExporter(ctx, driver)
+// Initializes an OTLP exporter, and configures the corresponding trace provider.
+func initTracerProvider(ctx context.Context, res *resource.Resource, conn *grpc.ClientConn) (func(context.Context) error, error) {
+	// Set up a trace exporter
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
 	if err != nil {
-		handleErr(err, "failed to create exporter")
-	} else {
-		log.Printf("created new exporter!")
+		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
 	}
 
-	res, err := resource.New(ctx,
-		resource.WithAttributes(
-			// the service name used to display traces in backends
-			semconv.ServiceNameKey.String("go-chain"),
-			// the service namespace used to display traces in backends
-			semconv.ServiceNamespaceKey.String("kjt-OTel-chain"),
-		),
-	)
-	if err != nil {
-		handleErr(err, "failed to create resource")
-	} else {
-		log.Printf("created new resource!")
-	}
-
-	bsp := sdktrace.NewBatchSpanProcessor(exp)
+	// Register the trace exporter with a TracerProvider, using a batch
+	// span processor to aggregate spans before export.
+	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithResource(res),
 		sdktrace.WithSpanProcessor(bsp),
 	)
-
-	cont := controller.New(
-		processor.New(
-			simple.NewWithExactDistribution(),
-			exp,
-		),
-		controller.WithExporter(exp),
-		controller.WithCollectPeriod(2*time.Second),
-	)
-
-	// set global propagator to tracecontext (the default is no-op)
 	otel.SetTracerProvider(tracerProvider)
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
-	//otel.SetMeterProvider(cont.MeterProvider())
-	//otel.SetTextMapPropagator(propagation.TraceContext{})
-	handleErr(cont.Start(context.Background()), "failed to start controller")
 
-	return func() {
-		// Shutdown will flush any remaining spans.
-		handleErr(tracerProvider.Shutdown(ctx), "failed to shutdown TracerProvider")
+	// Set global propagator to tracecontext (the default is no-op).
+	otel.SetTextMapPropagator(propagation.TraceContext{})
 
-		// Push any last metric events to the exporter.
-		handleErr(cont.Stop(context.Background()), "failed to stop controller")
-	}
+	// Shutdown will flush any remaining spans and shut down the exporter.
+	return tracerProvider.Shutdown, nil
 }
 
 func main() {
 
+	log.Println("Starting main!")
+	log.Printf("Waiting for connection...")
+
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+
+	conn, err := initConn()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := resource.New(ctx,
+		resource.WithAttributes(
+			// The service name used to display traces in backends
+			serviceName,
+			serviceNameSpace,
+		),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	shutdownTracerProvider, err := initTracerProvider(ctx, res, conn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err := shutdownTracerProvider(ctx); err != nil {
+			log.Fatalf("failed to shutdown TracerProvider: %s", err)
+		}
+	}()
+
 	goPort := os.Getenv("GO_PORT")
 
-	// Initialize OTLP & Trace Providers
-	shutdown := initProvider()
-	defer shutdown()
-
 	// Set propagator
-	propagator := propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})
-	otel.SetTextMapPropagator(propagator)
+	//propagator := propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})
+	//otel.SetTextMapPropagator(propagator)
 
 	// Create a "pat" router
 	r := pat.New()
 
 	otelNodeChainHandler := otelhttp.NewHandler(http.HandlerFunc(nodeChainHandler), "GET /node-chain")
 	otelGoChainHandler := otelhttp.NewHandler(http.HandlerFunc(goChainHandler), "GET /go-chain")
-	
+
 	r.Get("/node-chain", otelNodeChainHandler)
 	r.Get("/go-chain", otelGoChainHandler)
 
-	http.ListenAndServe(":" + goPort, r)
+	http.ListenAndServe(":"+goPort, r)
 }
 
 func nodeChainHandler(w http.ResponseWriter, req *http.Request) {
@@ -146,14 +144,13 @@ func nodeChainHandler(w http.ResponseWriter, req *http.Request) {
 	reqSpan := trace.SpanFromContext(ctx)
 	defer reqSpan.End()
 
-	/* Disabling the manual spans for now to keep this *relatively* simple
+	// Disabling the manual spans for now to keep this *relatively* simple
 	// Create a parent span called "operation"
 	func(ctx context.Context) {
 		var span trace.Span
 		ctx, span = tracer.Start(ctx, "node-chain operation")
 		defer span.End()
 
-		
 		// Create a child span called "sub-operation"
 		func(ctx context.Context) {
 			var span trace.Span
@@ -167,7 +164,6 @@ func nodeChainHandler(w http.ResponseWriter, req *http.Request) {
 			//time.Sleep(time.Duration(n) * time.Second)
 		}(ctx)
 	}(ctx)
-	*/
 
 	// Let's create another span to make a downstream call
 
@@ -244,9 +240,9 @@ func goChainHandler(w http.ResponseWriter, req *http.Request) {
 
 	// Create HTTP Client and enable Otel Propagation
 	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
-	var body []byte
 
 	err := func(ctx context.Context) error {
+
 		ctx, span := tracer.Start(ctx, "go-chain to python", trace.WithAttributes(semconv.PeerServiceKey.String("go-otel-api-client")))
 		defer span.End()
 		req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
@@ -256,7 +252,7 @@ func goChainHandler(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		body, err = io.ReadAll(res.Body)
+		//body, err = io.ReadAll(res.Body)
 		_ = res.Body.Close()
 
 		return err
